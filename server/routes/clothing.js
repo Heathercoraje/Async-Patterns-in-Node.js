@@ -1,34 +1,24 @@
 const express = require('express');
 const fs = require('fs');
+const fsPromises = require('fs').promises;
 const datafile = 'server/data/clothing.json';
 const router = express.Router();
 
 /* GET all clothing */
-router.route('/')
-  .get(function(req, res) {
-    getClothingData()
-      .then(data => {
-        console.log('Sending data to browser');
-        res.send(data);
-      })
-      .catch(error => res.status(500).send(error))
-      .finally(() => console.log('Complete processing Promise'));
-
-    console.log('doing more work');
-  });
+router.route('/').get(async function(req, res) {
+  try {
+    const clothingData = await getClothingData();
+    res.send(clothingData);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.toString() });
+  }
+});
 
 async function getClothingData() {
-  return new Promise((resolve, reject) => {
-    fs.readFile(datafile, 'utf8', (error, data) => {
-      if (error) {
-        reject(error)
-      }
-      else {
-        resolve(data);
-      }
-    });
-  });
-  // A promise object returned by Promise Constructor(executor)
-};
+  const rawData = await fsPromises.readFile(datafile, 'utf8');
+  const data = JSON.parse(rawData);
+  return data;
+}
 
 module.exports = router;

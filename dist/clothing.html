@@ -16,15 +16,20 @@
 
     <script>
       fetch('/api/clothing')
-        .then(response => response.json())
+        .then(response => {
+            return response.json() 
+        })
         .then(data => {
           let string_data = JSON.stringify(data);
-
           let formatted_data = '';
-
-          data.forEach(element => {
+          if (data.error) {
+            formatted_data +=`<div><h1>${data.error}</h1></div>`
+          }
+          else {
+            data.forEach(element => {
             formatted_data += '<div><h3>' + element.itemName + ' - $' + element.price + '</h3></div>';
-          });
+            });
+          }
 
           let clothing_div = document.getElementById('clothing-list');
           clothing_div.innerHTML = formatted_data;
