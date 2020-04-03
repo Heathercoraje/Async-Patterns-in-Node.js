@@ -5,7 +5,35 @@ const datafile = 'server/data/clothing.json';
 const router = express.Router();
 
 /* GET all clothing */
-router
+
+async function getClothingData() {
+  const rawData = await fsPromises.readFile(datafile, 'utf8');
+  const data = JSON.parse(rawData);
+  return data;
+}
+
+async function saveClothingData(data) {
+  return fsPromises.writeFile(datafile, JSON.stringify(data, null, 4));
+}
+
+function getNextAvailableID(data) {
+  let max = 0;
+  data.forEach(data => {
+    if(data.clothingID > max) {
+      max = data.clothingID;
+    }
+  });
+  return ++max
+}
+
+module.exports = function(monitor) {
+  const dataMonitor = monitor;
+
+  dataMonitor.on('dataAdded', (itemName) => {
+    setImmediate(()=> console.log(`new item added: ${itemName}`));
+  });
+
+  router
   .route('/')
   .get(async function(req, res) {
     try {
@@ -27,26 +55,10 @@ router
 
     data.push(newClothingItem);
     await saveClothingData(data);
+
+    dataMonitor.emit('dataAdded', newClothingItem.itemName);
+    console.log('sending data to browser')
     res.status(201).send(newClothingItem);
   });
-async function getClothingData() {
-  const rawData = await fsPromises.readFile(datafile, 'utf8');
-  const data = JSON.parse(rawData);
-  return data;
+  return router;
 }
-
-async function saveClothingData(data) {
-  return fsPromises.writeFile(datafile, JSON.stringify(data, null, 4));
-}
-
-function getNextAvailableID(data) {
-  let max = 0;
-  data.forEach(data => {
-    if(data.clothingID > max) {
-      max = data.clothingID;
-    }
-  });
-  return ++max
-}
-
-module.exports = router;
