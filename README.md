@@ -9,4 +9,4 @@ I will update this repo below with any problems or small issues reported between
 
 Thanks for watching and good luck on your Node projects!
 
-*This is a folk of orignal repository for tutorial  [Async Pattern in Node.js](https://app.pluralsight.com/library/courses/nodejs-async-patterns) for personal learning. Check out main takeaways of this tutorial [here.](./mainTakeaway.md)*
+*This is a folk of orignal repository for tutorial  [Async Pattern in Node.js](https://app.pluralsight.com/library/courses/nodejs-async-patterns) for personal learning. Check out main takeaways of this tutorial [here.](./takeaways.md)*
