@@ -1,17 +1,64 @@
 const express = require('express');
 const fs = require('fs');
+const fsPromises = require('fs').promises;
 const datafile = 'server/data/clothing.json';
 const router = express.Router();
 
 /* GET all clothing */
-router.route('/')
-  .get(function(req, res) {
 
-    let rawData = fs.readFileSync(datafile, 'utf8');
-    let clothingData = JSON.parse(rawData);
+async function getClothingData() {
+  const rawData = await fsPromises.readFile(datafile, 'utf8');
+  const data = JSON.parse(rawData);
+  return data;
+}
 
-    res.send(clothingData);
+async function saveClothingData(data) {
+  return fsPromises.writeFile(datafile, JSON.stringify(data, null, 4));
+}
 
+function getNextAvailableID(data) {
+  let max = 0;
+  data.forEach(data => {
+    if(data.clothingID > max) {
+      max = data.clothingID;
+    }
+  });
+  return ++max
+}
+
+module.exports = function(monitor) {
+  const dataMonitor = monitor;
+
+  dataMonitor.on('dataAdded', (itemName) => {
+    setImmediate(()=> console.log(`new item added: ${itemName}`));
   });
 
-module.exports = router;
+  router
+  .route('/')
+  .get(async function(req, res) {
+    try {
+      const clothingData = await getClothingData();
+      res.send(clothingData);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.toString() });
+    }
+  })
+  .post(async function(req, res) {
+    let data = await getClothingData();
+    let nextID = getNextAvailableID(data);
+    let newClothingItem = {
+      clothingID: nextID,
+      itemName: req.body.itemName,
+      price: req.body.price
+    };
+
+    data.push(newClothingItem);
+    await saveClothingData(data);
+
+    dataMonitor.emit('dataAdded', newClothingItem.itemName);
+    console.log('sending data to browser')
+    res.status(201).send(newClothingItem);
+  });
+  return router;
+}

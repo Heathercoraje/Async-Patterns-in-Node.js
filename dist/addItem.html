@@ -14,28 +14,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://www.pluralsight.com/content/dam/pluralsight2/teach/author-tools/carved-rock-fitness/js/bootstrap.min.js"></script>
 
-    <script>
-      fetch('/api/clothing')
-        .then(response => {
-            return response.json() 
-        })
-        .then(data => {
-          let string_data = JSON.stringify(data);
-          let formatted_data = '';
-          if (data.error) {
-            formatted_data +=`<div><h1>${data.error}</h1></div>`
-          }
-          else {
-            data.forEach(element => {
-            formatted_data += '<div><h3>' + element.itemName + ' - $' + element.price + '</h3></div>';
-            });
-          }
-
-          let clothing_div = document.getElementById('clothing-list');
-          clothing_div.innerHTML = formatted_data;
-        });
-    </script>
-
 </head>
 <body>
 <div class="crf">
@@ -79,11 +57,14 @@
 
     <!-- product list goes here -->
     <div class="container">
-      <h1>Clothing</h1>
-      <div id=clothing-list></div>
-      <a href="./addItem.html">Add new Item</a>
-    </div>
-
+    <form id="addItemForm">
+        <label>New Item name</label>
+        <input type="text" name="itemName" placeholder="itemName"><br>
+        <label>Price</label>
+        <input type="text" name="price" placeholder="price"><br>
+        <input type="submit" value="Submit">
+    </form>
+      
     </div>
 
     <!-- FOOTER -->
@@ -160,5 +141,25 @@
         <div class="crf-footer--copyright text-primary">@Pluralsight 2018</div>
     </footer>
 </div>
+<script>
+    window.addEventListener("load", function() {
+      let form = document.getElementById('addItemForm');
+
+      form.addEventListener('submit', (event) => {
+
+        event.preventDefault();
+        window.location.replace("/clothing.html")
+        let data = new URLSearchParams(new FormData(form));
+
+        fetch('/api/clothing', {
+          method: 'POST',
+          body: data
+        })
+        .then(response => window.location.replace("/clothing.html"));
+      });
+
+    })
+
+</script>
 </body>
 </html>
