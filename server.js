@@ -2,10 +2,15 @@ const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
 const bodyParser = require('body-parser');
-
-const clothing = require('./server/routes/clothing');
+const DataMonitor = require('./server/DataMonitor');
 const errors = require('./server/routes/errors');
 
+let dataMonitor = new DataMonitor();
+dataMonitor.on('dataAdded', () => {
+  console.log('New data added');
+});
+
+const clothing = require('./server/routes/clothing')(dataMonitor);
 const app = express();
 
 app.use(favicon(path.join(__dirname, 'dist/favicon.ico')));
