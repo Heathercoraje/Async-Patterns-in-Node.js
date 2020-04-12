@@ -26,6 +26,6 @@ EventEmitter is a module that facilitates communication between objects in node.
 ---
 
 #### Utilising Worker Threads
-Worker Threads only helps CPU intensive operations. There are solutions. i.e cluster API(using multiple processes) however, it sacrifices shared memory. Worker threads allows to have multiple threads in one process. 
+Worker Threads only helps CPU intensive operations. There are solutions. i.e cluster API(using multiple processes) however, it sacrifices shared memory. Worker threads allows to have threads running in background within one process. 
 
 [Useful read - Node.js multithreading: What are Worker threads, and why do they matter?](https://www.valentinog.com/blog/event/)
